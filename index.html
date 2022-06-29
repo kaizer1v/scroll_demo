@@ -55,11 +55,11 @@
       </section>
     </div>
 
+    <!-- <span id='counter'>3</span> -->
     <svg id='vis'>
+      <text x='50' y='40' id='counter' style='font-size: 4rem'>0</text>
       <circle r='50' fill='red' cx='70' cy='70'></circle>
     </svg>
-
-    <span id='counter'>0</span>
 
     <div id="extra-space"></div>
   </div>
@@ -72,6 +72,7 @@
 <!-- <script src="js/sections.js"></script> -->
 <script>
   const circle = d3.select('svg circle')
+  const km_counter = d3.select('#counter')
    /**
    * Select all `sections` and get their top position coordinate
    * Create an array of functions corresponding to each section
@@ -93,6 +94,7 @@
       .attr('cy', 70)
       .attr('fill', 'red')
   }
+
   const first  = () => {
     // console.log('first activated')
     circle.transition()
@@ -101,13 +103,17 @@
       .attr('fill', 'red')
     // circle.transition()
   }
+
   const second = () => {
     // console.log('second activated')
     circle.transition('move-fills').duration(300)
       .attr('fill', 'blue')
       .attr('cx', 450)
       .attr('cy', 350)
+
+    km_counter.transition().text(10)
   }
+
   const three  = () => { console.log('three activated') }
   const fourth = () => { console.log('fourth activated') }
   const five   = () => { console.log('five activated') }
@@ -117,7 +123,9 @@
       .attr('cx', 250)
       .attr('cy', 500)
       .attr('fill', 'purple')
+    km_counter.transition().text(30)
   }
+
   const seven  = () => { console.log('seventh heaven activated') }
   const eight  = () => { console.log('eight activated') }
 
