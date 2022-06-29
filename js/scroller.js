@@ -1,4 +1,3 @@
-
 /**
  * scroller - handles the details
  * of figuring out which section
@@ -73,6 +72,7 @@ function scroller() {
     // of the first section.
     sectionPositions = [];
     var startPos;
+
     sections.each(function (d, i) {
       var top = this.getBoundingClientRect().top;
       if (i === 0) {
@@ -80,7 +80,8 @@ function scroller() {
       }
       sectionPositions.push(top - startPos);
     });
-    containerStart = container.node().getBoundingClientRect().top + window.pageYOffset;
+
+    containerStart = container.node().getBoundingClientRect().top + window.pageYOffset; // will always be 0
   }
 
   /**
@@ -93,6 +94,7 @@ function scroller() {
   function position() {
     var pos = window.pageYOffset - 10 - containerStart;
     var sectionIndex = d3.bisect(sectionPositions, pos);
+
     sectionIndex = Math.min(sections.size() - 1, sectionIndex);
 
     if (currentIndex !== sectionIndex) {

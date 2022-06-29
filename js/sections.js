@@ -730,10 +730,12 @@ var scrollVis = function () {
    * @param index - index of the activated section
    */
   chart.activate = function (index) {
+    console.log('ACTIVATED', index)
     activeIndex = index;
     var sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
     var scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
     scrolledSections.forEach(function (i) {
+      // console.log(activateFunctions[i])
       activateFunctions[i]();
     });
     lastIndex = activeIndex;
@@ -746,6 +748,7 @@ var scrollVis = function () {
    * @param progress
    */
   chart.update = function (index, progress) {
+    console.log('PROGRESSING IN', index, progress)
     updateFunctions[index](progress);
   };
 
