@@ -55,7 +55,11 @@
       </section>
     </div>
 
-    <div id='vis'></div>
+    <svg id='vis'>
+      <circle r='50' fill='red' cx='70' cy='70'></circle>
+    </svg>
+
+    <span id='counter'>0</span>
 
     <div id="extra-space"></div>
   </div>
@@ -67,6 +71,7 @@
 <!-- <script src="js/scroller.js"></script> -->
 <!-- <script src="js/sections.js"></script> -->
 <script>
+  const circle = d3.select('svg circle')
    /**
    * Select all `sections` and get their top position coordinate
    * Create an array of functions corresponding to each section
@@ -81,13 +86,38 @@
   const progressListnerer = (e) => { console.log(e.target.innerHTML, 'progress triggered') }
 
   // do all kinds of manipulations to html at every corresponding section...
-  const zeroth = () => { console.log('zeroth activated') }
-  const first  = () => { console.log('first activated') }
-  const second = () => { console.log('second activated') }
+  const zeroth = () => {
+    console.log('zeroth activated')
+    circle.transition()
+      .attr('cx', 70)
+      .attr('cy', 70)
+      .attr('fill', 'red')
+  }
+  const first  = () => {
+    // console.log('first activated')
+    circle.transition()
+      .attr('cx', 400)
+      .attr('cy', 200)
+      .attr('fill', 'red')
+    // circle.transition()
+  }
+  const second = () => {
+    // console.log('second activated')
+    circle.transition('move-fills').duration(300)
+      .attr('fill', 'blue')
+      .attr('cx', 450)
+      .attr('cy', 350)
+  }
   const three  = () => { console.log('three activated') }
   const fourth = () => { console.log('fourth activated') }
   const five   = () => { console.log('five activated') }
-  const six    = () => { console.log('six activated') }
+  const six    = () => {
+    console.log('six activated')
+    circle.transition()
+      .attr('cx', 250)
+      .attr('cy', 500)
+      .attr('fill', 'purple')
+  }
   const seven  = () => { console.log('seventh heaven activated') }
   const eight  = () => { console.log('eight activated') }
 
