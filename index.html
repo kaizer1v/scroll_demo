@@ -56,10 +56,13 @@
     </div>
 
     <!-- <span id='counter'>3</span> -->
-    <svg id='vis'>
+    <!-- <svg id='vis'>
       <text x='50' y='40' id='counter' style='font-size: 4rem'>0</text>
       <circle r='50' fill='red' cx='70' cy='70'></circle>
-    </svg>
+    </svg> -->
+    <div id='vis'>
+      <!-- Viz over here -->
+    </div>
 
     <div id="extra-space"></div>
   </div>
@@ -68,114 +71,74 @@
 
 <script src="lib/d3.js"></script>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.5.0/d3.min.js" integrity="sha512-+rnC6CO1Ofm09H411e0Ux7O9kqwM5/FlEHul4OsPk4QIHIYAiM77uZnQyIqcyWaZ4ddHFCvZGwUVGwuo0DPOnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-<!-- <script src="js/scroller.js"></script> -->
+<script src="js/scroller.js"></script>
 <!-- <script src="js/sections.js"></script> -->
-<script>
-  const circle = d3.select('svg circle')
-  const km_counter = d3.select('#counter')
-   /**
-   * Select all `sections` and get their top position coordinate
-   * Create an array of functions corresponding to each section
-   * Monitor the scroll event to know which section user has scrolled to
-   * Based on position index, trigger corresponding function for that section
-   **/
+<!-- <script src="js/ditch.js"></script> -->
+<script type="text/javascript">
 
-  const eventActivate = new Event('activate')
-  const eventProgress = new Event('progress')
+(function() {
+  let svg = d3.select("#vis")
+    .append('svg')
+    .attr('width', 1000)
+    .attr('height', 950)
+    .attr('opacity', 1)
 
-  // const activateListnerer = (e) => { console.log(e.target.innerHTML, 'activate triggered') }
-  const progressListnerer = (e) => { console.log(e.target.innerHTML, 'progress triggered') }
+  svg.append('circle')
+    .attr('cx', 30)
+    .attr('cy', 30)
+    .attr('r', 20)
 
-  // do all kinds of manipulations to html at every corresponding section...
-  const zeroth = () => {
-    console.log('zeroth activated')
-    circle.transition()
-      .attr('cx', 70)
-      .attr('cy', 70)
-      .attr('fill', 'red')
-  }
+}())
 
-  const first  = () => {
-    // console.log('first activated')
-    circle.transition()
-      .attr('cx', 400)
-      .attr('cy', 200)
-      .attr('fill', 'red')
-    // circle.transition()
-  }
+const fn1 = () => {
+  let svg = d3.select('#vis').select('svg circle')
+    .transition()
+    .attr('cx', 30)
+    .attr('cy', 30)
+    .attr('r', 20)
+}
 
-  const second = () => {
-    // console.log('second activated')
-    circle.transition('move-fills').duration(300)
-      .attr('fill', 'blue')
-      .attr('cx', 450)
-      .attr('cy', 350)
+const fn2 = () => {
+  let svg = d3.select('#vis').select('svg circle')
+    .transition()
+    .attr('cx', 80)
+    .attr('cy', 80)
+    .attr('r', 30)
+}
 
-    km_counter.transition().text(10)
-  }
+activationFunctions = [
+  fn1,
+  fn2,
+  () => { console.log('fn 3') },
+  () => { console.log('fn 4') },
+  () => { console.log('fn 5') },
+  () => { console.log('fn 6') },
+  () => { console.log('fn 7') },
+  () => { console.log('fn 8') },
+  () => { console.log('fn 9') }
+]
 
-  const three  = () => { console.log('three activated') }
-  const fourth = () => { console.log('fourth activated') }
-  const five   = () => { console.log('five activated') }
-  const six    = () => {
-    console.log('six activated')
-    circle.transition()
-      .attr('cx', 250)
-      .attr('cy', 500)
-      .attr('fill', 'purple')
-    km_counter.transition().text(30)
-  }
+let scroll = scroller().container(d3.select('#graphic'))
+scroll(d3.selectAll('.step'))
 
-  const seven  = () => { console.log('seventh heaven activated') }
-  const eight  = () => { console.log('eight activated') }
+let lastIndex,
+    activeIndex = 0;
 
-  const events = []
-        events[0] = zeroth
-        events[1] = first
-        events[2] = second
-        events[3] = three
-        events[4] = fourth
-        events[5] = five
-        events[6] = six
-        events[7] = seven
-        events[8] = eight
+scroll.on('active', function(index) {
+  d3.selectAll('.step')
+    .transition().duration(200)
+    .style('opacity', (d, i) => { return i === index ? 1 : 0.1 })
 
-  let currentIndex = -1
-  const sections = Array.prototype.slice.call(document.getElementsByClassName('step')),
-        sectionPositions = []
+  activeIndex = index
+  let sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
+  let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
 
-  sections.forEach((e, i) => {
-    let top = e.getBoundingClientRect().top
-    if(i === 0) { startPos = top }
-
-    // maintain position tops relative to the first section
-    sectionPositions.push(top - startPos)
-
-    // attach event listener to each section
-    sections[i].addEventListener('activate', events[i], false)
-    sections[i].addEventListener('progress', progressListnerer, false)
+  // trigger section based functions
+  scrolledSections.forEach(i => {
+    activationFunctions[i]();
   })
-
-  document.addEventListener('scroll', (e) => {
-    let currPos = window.pageYOffset - (document.body.getBoundingClientRect().top + window.pageYOffset)
-    let sectionIndex = d3.bisect(sectionPositions, currPos)
-
-    sectionIndex = Math.min(sections.length - 1, sectionIndex)
-
-    if(currentIndex !== sectionIndex) {
-      sections[sectionIndex].dispatchEvent(eventActivate)
-
-      currentIndex = sectionIndex
-
-      events[sectionIndex]()
-    }
-
-    let prevIndex = Math.max(sectionIndex - 1, 0)
-    let prevTop = sectionPositions[prevIndex]
-    let progress = (currPos - prevTop) / (sectionPositions[sectionIndex] - prevTop)
-    sections[sectionIndex].dispatchEvent(eventProgress)
-
-  })
+  lastIndex = activeIndex;
+})
 
 </script>
 </body>

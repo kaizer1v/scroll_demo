@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { bisect } from 'd3'
+import { bisect, select } from 'd3'
 // import logo from './logo.svg';
 import './App.css';
 
@@ -9,13 +9,15 @@ const sectionsData = [
     'content': 'this is another section'
   }, {
     'title': "Filler Words",
-    'content': 'this is another section'
+    'content': 'this is another section',
+    'data': { 'r': 20, 'cx': 100 }
   }, {
     'title': "My Talk",
     'content': 'this is another section'
   }, {
     'title': "My Stumbles",
-    'content': 'this is another section'
+    'content': 'this is another section',
+    'data': { 'r': 50, 'cx': 200 }
   }, {
     'title': "Um's, Ah's &amp; Uh's",
     'content': 'this is another section'
@@ -34,10 +36,26 @@ const sectionsData = [
   },
 ]
 
+
+// a fn that should taken an object as a parameter containing the config of the charts
+//  and renders it as a svg element.
+function render(graphData) {
+
+
+
+  if(graphData.cx)
+    return (
+      <circle r={graphData.r} cx={ graphData.cx }></circle>
+    )
+}
+
+
 function App() {
   const [positions, setPositions] = useState([])
   const [currPos, setPos]   = useState(window.pageYOffset)
   const [currSect, setCurrSect] = useState(0)
+
+  const [graphData, setGraphData] = useState({})
   // let sectionPositions = []
 
   // trigger `setPos` whenever user scrolls on the page
@@ -65,16 +83,22 @@ function App() {
 
   // run this whenever section changes
   useEffect(() => {
-    console.log('currently selected section', currSect)
-  }, [currSect])
+    console.log('currently selected section', sectionsData[currSect])
 
+    // clear css from all other sections & highlight only current section
+    sectionsData.map(d => d['css'] = '')
+    sectionsData[currSect]['css'] = 'highlighted'
+
+    setGraphData(sectionsData[currSect]['data'] || {})
+
+  }, [currSect])
 
   return (
     <div className="container">
       <div id="graphic">
         <div id="sections">
           { sectionsData.map((d, i) => (
-            <section className="step" key={i}>
+            <section className={`step ${ d['css'] }`} key={i}>
               <div className="title">{ d['title'] }</div>
               { d['content'] }
             </section>
@@ -82,7 +106,17 @@ function App() {
         </div>
 
         <svg id="vis">
-          <circle r="50" fill="red" cx="70" cy="70"></circle>
+          {/*{ render(graphData) }*/}
+          {/*<VictoryBar
+            style={{ data: { fill: "tomato", width: 25 } }}
+            data={[
+            { x: "cat", y: 10 },
+            { x: "dog", y: 25 },
+            { x: "bird", y: 40 },
+            { x: "frog", y: 50 },
+            { x: "fish", y: 50 }
+            ]}
+          />*/}
         </svg>
         <div id="extra-space"></div>
       </div>
