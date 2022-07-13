@@ -1,3 +1,10 @@
+<!--
+
+* every section needs to be pre-rendered and then shown / hidden based on the current section in view. appending / removing is a hard thing to do
+* maybe one or 2 sections can be updated / moved
+* use transition opacity to show and hide
+
+-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,23 +17,40 @@
   <div id='graphic'>
     <div id='sections'>
       <section class="step">
-        <div class="title">OpenVis Conf 2013</div>
-        I did what no presenter should ever do: I watched my own talk.<br/><br/>My first visit to OpenVis Conf in 2013.
+        <div class="title">My Uber Data</div>
+        I was curious about my cab usage history.<br/><br/>I found some really interesting insights. Here's a journey
+        of my cab
       </section>
 
       <section class="step">
-        <div class="title">Filler Words</div>
-        As expected, I could only focus on the flaws: the rushed speech, the odd phrases, and, most especially, all the filler words. In fact, I found 180 filler words in my 30 minute talk.
+        <div class="title">Let's begin the journey</div>
+        I started using Uber in the year 2015, farily at the same time when they had launched in Bangalore. At the time,
+        the pain in negotiating with auto drivers was at it's peak. Where they demanded 300 INR for a 2 km ride.
       </section>
 
       <section class="step">
-        <div class="title">My Talk</div>
-        Here are all 5,040 words of my talk.
+        <div class="title">...</div>
+        Here's an overview of what I found when I analysed my Uber data.
+        <!--
+            total spendings: INR 93760.8 (almost a lakh)
+            total km travelled: 4877 km (that's like Bangalore to Delhi and back)
+            total # of trips: <that's a 50% cancellation rate 😳)
+              COMPLETED          339
+              CANCELED           158
+              UNFULFILLED         67
+              DRIVER_CANCELED     24
+            total inr / km rate: <that's 19.22 INR / km rate>
+        -->
       </section>
 
       <section class="step">
-        <div class="title">My Stumbles</div>
-        And here are all the fillers I used in those 30 minutes.
+        <div class="title">Rides</div>
+        Lets look at the # rides I have taken
+        <!--
+          overview about completed & cancelled rides
+          50% cancellation rate + requests that didn't go through were about 19%
+          break-down by types of car
+        -->
       </section>
 
       <section class="step">
@@ -76,10 +100,16 @@
 <!-- <script src="js/ditch.js"></script> -->
 <script type="text/javascript">
 
+  /** BUGS
+   * activate control even on fast-scroll
+   * some sections are being skipped when scrolling back up
+   */
+
 (function() {
   let svg = d3.select("#vis")
     .append('svg')
-    .attr('width', 1000)
+
+  svg.attr('width', 1000)
     .attr('height', 950)
     .attr('opacity', 1)
 
@@ -91,53 +121,78 @@
 }())
 
 const fn1 = () => {
-  let svg = d3.select('#vis').select('svg circle')
+  let svg = d3.select('#vis').select('svg')
+
+  svg.select('circle')
     .transition()
     .attr('cx', 30)
     .attr('cy', 30)
     .attr('r', 20)
+
 }
 
 const fn2 = () => {
-  let svg = d3.select('#vis').select('svg circle')
+  let svg = d3.select('#vis').select('svg')
+
+  svg.select('circle')
     .transition()
     .attr('cx', 80)
     .attr('cy', 80)
     .attr('r', 30)
+
+  const total_distance = 4877
+  const total_spendings = 93760.8
+  const g = svg.append('g')
+  g.append('text').text(`Total distance travelled = ${total_distance}`).attr('x', 100).attr('y', 100)
+  g.append('text').text(`Total spendings = ${total_spendings}`).attr('x', 100).attr('y', 150)
 }
 
-activationFunctions = [
+
+const clear = () => {
+  // clear the svg for next section to load
+}
+
+// -----
+
+let sss = scroller().container(d3.select('#graphic'))
+sss(d3.selectAll('.step'))
+
+const activationFunctions = [
   fn1,
   fn2,
-  () => { console.log('fn 3') },
-  () => { console.log('fn 4') },
-  () => { console.log('fn 5') },
-  () => { console.log('fn 6') },
-  () => { console.log('fn 7') },
+  () => { d3.select('svg circle').transition().attr('fill', 'red') },
+  () => { d3.select('svg circle').transition().attr('cx', 120) },
+  () => { d3.select('svg circle').transition().attr('cy', 120) },
+  () => { d3.select('svg circle').transition().attr('r', 60) },
+  () => { d3.select('svg circle').transition().attr('r', 80).attr('fill', 'purple').attr('stroke', 'pink').attr('stroke-width', 5) },
   () => { console.log('fn 8') },
   () => { console.log('fn 9') }
 ]
 
-let scroll = scroller().container(d3.select('#graphic'))
-scroll(d3.selectAll('.step'))
-
-let lastIndex,
+let lastIndex = -1,
     activeIndex = 0;
 
-scroll.on('active', function(index) {
-  d3.selectAll('.step')
-    .transition().duration(200)
-    .style('opacity', (d, i) => { return i === index ? 1 : 0.1 })
-
+const activate = (index) => {
   activeIndex = index
-  let sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
-  let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
+  let sign = (activeIndex - lastIndex) < 0 ? -1 : 1
+  let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign)
+  scrolledSections.forEach((i) => { activationFunctions[i]() })
+  lastIndex = activeIndex
+}
 
-  // trigger section based functions
-  scrolledSections.forEach(i => {
-    activationFunctions[i]();
-  })
-  lastIndex = activeIndex;
+// setup event handling
+sss.on('active', function (index) {
+  // highlight current step text
+  d3.selectAll('.step')
+    .style('opacity', function (d, i) { return i === index ? 1 : 0.1; })
+
+  // activate current section
+  activate(index)    // plot is an object that updates a chart based on it's index
+})
+
+sss.on('progress', (index, progress) => {
+  // do what you want to within each section index's progress
+  console.log(index, progress)
 })
 
 </script>

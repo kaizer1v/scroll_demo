@@ -3,12 +3,12 @@
  * of figuring out which section
  * the user is currently scrolled
  * to.
- *
+ * https://vallandingham.me/scroller.html
  */
 function scroller() {
   var container = d3.select('body');
   // event dispatcher
-  var dispatch = d3.dispatch('active', 'progress');
+  var dispatch = d3.dispatch('active', 'progress', 'to');
 
   // d3 selection of all the
   // text sections that will

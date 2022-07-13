@@ -625,6 +625,7 @@ var scrollVis = function () {
    *  how far user has scrolled in section
    */
   function updateCough(progress) {
+    console.log('update');
     g.selectAll('.cough')
       .transition()
       .duration(0)
@@ -730,6 +731,7 @@ var scrollVis = function () {
    * @param index - index of the activated section
    */
   chart.activate = function (index) {
+
     activeIndex = index;
     var sign = (activeIndex - lastIndex) < 0 ? -1 : 1;
     var scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign);
@@ -747,6 +749,7 @@ var scrollVis = function () {
    * @param progress
    */
   chart.update = function (index, progress) {
+    console.log('PROGRESSING IN', index, progress)
     updateFunctions[index](progress);
   };
 
@@ -772,14 +775,13 @@ function display(data) {
     .call(plot);
 
   // setup scroll functionality
-  var scroll = scroller()
-    .container(d3.select('#graphic'));
+  var sss = scroller().container(d3.select('#graphic'));
 
   // pass in .step selection as the steps
-  scroll(d3.selectAll('.step'));
+  sss(d3.selectAll('.step'));
 
   // setup event handling
-  scroll.on('active', function (index) {
+  sss.on('active', function (index) {
     // highlight current step text
     d3.selectAll('.step')
       .style('opacity', function (d, i) { return i === index ? 1 : 0.1; });
@@ -788,7 +790,7 @@ function display(data) {
     plot.activate(index);
   });
 
-  scroll.on('progress', function (index, progress) {
+  sss.on('progress', function (index, progress) {
     plot.update(index, progress);
   });
 }
