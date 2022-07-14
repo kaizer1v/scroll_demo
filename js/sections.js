@@ -382,6 +382,8 @@ var scrollVis = function () {
    *
    */
   function showGrid() {
+
+    // hide the previous section's elements (could be from bottom or top)
     g.selectAll('.count-title')
       .transition()
       .duration(0)
@@ -406,6 +408,8 @@ var scrollVis = function () {
    *  are moved back to their place in the grid
    */
   function highlightGrid() {
+
+    // hide adjacent section's elements (top & bottom)
     hideAxis();
     g.selectAll('.bar')
       .transition()
@@ -416,7 +420,6 @@ var scrollVis = function () {
       .transition()
       .duration(0)
       .attr('opacity', 0);
-
 
     g.selectAll('.square')
       .transition()
@@ -430,12 +433,8 @@ var scrollVis = function () {
     g.selectAll('.fill-square')
       .transition('move-fills')
       .duration(800)
-      .attr('x', function (d) {
-        return d.x;
-      })
-      .attr('y', function (d) {
-        return d.y;
-      });
+      .attr('x', (d) => d.x )
+      .attr('y', (d) => d.y )
 
     g.selectAll('.fill-square')
       .transition()
@@ -456,14 +455,17 @@ var scrollVis = function () {
     // ensure bar axis is set
     showAxis(xAxisBar);
 
+    console.log('showing bar now..');
+
     g.selectAll('.square')
       .transition()
       .duration(800)
       .attr('opacity', 0);
 
+    // fading the squares from the previous section
     g.selectAll('.fill-square')
       .transition()
-      .duration(800)
+      .duration(3000)
       .attr('x', 0)
       .attr('y', function (d, i) {
         return yBarScale(i % 3) + yBarScale.bandwidth() / 2;
@@ -472,6 +474,7 @@ var scrollVis = function () {
       .duration(0)
       .attr('opacity', 0);
 
+    // loading the histogram
     g.selectAll('.hist')
       .transition()
       .duration(600)

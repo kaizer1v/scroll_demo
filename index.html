@@ -97,7 +97,7 @@
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.5.0/d3.min.js" integrity="sha512-+rnC6CO1Ofm09H411e0Ux7O9kqwM5/FlEHul4OsPk4QIHIYAiM77uZnQyIqcyWaZ4ddHFCvZGwUVGwuo0DPOnQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 <script src="js/scroller.js"></script>
 <!-- <script src="js/sections.js"></script> -->
-<!-- <script src="js/ditch.js"></script> -->
+<script src="js/my_scroller.js"></script>
 <script type="text/javascript">
 
   /** BUGS
@@ -105,95 +105,7 @@
    * some sections are being skipped when scrolling back up
    */
 
-(function() {
-  let svg = d3.select("#vis")
-    .append('svg')
 
-  svg.attr('width', 1000)
-    .attr('height', 950)
-    .attr('opacity', 1)
-
-  svg.append('circle')
-    .attr('cx', 30)
-    .attr('cy', 30)
-    .attr('r', 20)
-
-}())
-
-const fn1 = () => {
-  let svg = d3.select('#vis').select('svg')
-
-  svg.select('circle')
-    .transition()
-    .attr('cx', 30)
-    .attr('cy', 30)
-    .attr('r', 20)
-
-}
-
-const fn2 = () => {
-  let svg = d3.select('#vis').select('svg')
-
-  svg.select('circle')
-    .transition()
-    .attr('cx', 80)
-    .attr('cy', 80)
-    .attr('r', 30)
-
-  const total_distance = 4877
-  const total_spendings = 93760.8
-  const g = svg.append('g')
-  g.append('text').text(`Total distance travelled = ${total_distance}`).attr('x', 100).attr('y', 100)
-  g.append('text').text(`Total spendings = ${total_spendings}`).attr('x', 100).attr('y', 150)
-}
-
-
-const clear = () => {
-  // clear the svg for next section to load
-}
-
-// -----
-
-let sss = scroller().container(d3.select('#graphic'))
-sss(d3.selectAll('.step'))
-
-const activationFunctions = [
-  fn1,
-  fn2,
-  () => { d3.select('svg circle').transition().attr('fill', 'red') },
-  () => { d3.select('svg circle').transition().attr('cx', 120) },
-  () => { d3.select('svg circle').transition().attr('cy', 120) },
-  () => { d3.select('svg circle').transition().attr('r', 60) },
-  () => { d3.select('svg circle').transition().attr('r', 80).attr('fill', 'purple').attr('stroke', 'pink').attr('stroke-width', 5) },
-  () => { console.log('fn 8') },
-  () => { console.log('fn 9') }
-]
-
-let lastIndex = -1,
-    activeIndex = 0;
-
-const activate = (index) => {
-  activeIndex = index
-  let sign = (activeIndex - lastIndex) < 0 ? -1 : 1
-  let scrolledSections = d3.range(lastIndex + sign, activeIndex + sign, sign)
-  scrolledSections.forEach((i) => { activationFunctions[i]() })
-  lastIndex = activeIndex
-}
-
-// setup event handling
-sss.on('active', function (index) {
-  // highlight current step text
-  d3.selectAll('.step')
-    .style('opacity', function (d, i) { return i === index ? 1 : 0.1; })
-
-  // activate current section
-  activate(index)    // plot is an object that updates a chart based on it's index
-})
-
-sss.on('progress', (index, progress) => {
-  // do what you want to within each section index's progress
-  console.log(index, progress)
-})
 
 </script>
 </body>
